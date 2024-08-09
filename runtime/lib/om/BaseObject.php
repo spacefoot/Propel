@@ -236,7 +236,9 @@ abstract class BaseObject
     /**
      * Code to be run after object hydration
      *
-     * @param PropelPDO $con
+     * @param array $row
+     * @param int $startcol
+     * @param bool $rehydrate
      */
     public function postHydrate($row, $startcol = 0, $rehydrate = false)
     {
@@ -267,9 +269,9 @@ abstract class BaseObject
      * <code>obj</code> is an instance of <code>BaseObject</code>, delegates to
      * <code>equals(BaseObject)</code>.  Otherwise, returns <code>false</code>.
      *
-     * @param      obj The object to compare to.
+     * @param object obj The object to compare to.
      *
-     * @return Whether equal to the object specified.
+     * @return bool Whether equal to the object specified.
      */
     public function equals($obj)
     {

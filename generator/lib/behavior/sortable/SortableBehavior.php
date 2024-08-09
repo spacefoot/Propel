@@ -98,7 +98,6 @@ class SortableBehavior extends Behavior
             $buildScope      = array();
             $buildScopeVars  = array();
             $paramsDoc       = array();
-            $buildScopeVars  = array();
 
             foreach ($this->getScopes() as $idx => $scope) {
 

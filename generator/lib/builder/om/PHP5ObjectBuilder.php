@@ -851,14 +851,14 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . " ";
         }
         $script .= "
      *
-     * @param string \$format The date/time format string (either date()-style or strftime()-style).
+     * @param null|string \$format The date/time format string (either date()-style or strftime()-style).
      *				 If format is null, then the raw " . ($useDateTime ? 'DateTime object' : 'unix timestamp integer') . " will be returned.";
         if ($useDateTime) {
             $script .= "
-     * @return mixed Formatted date/time value as string or $dateTimeClass object (if format is null), null if column is null" . ($handleMysqlDate ? ', and 0 if column value is ' . $mysqlInvalidDateString : '');
+     * @return null|string|DateTime Formatted date/time value as string or $dateTimeClass object (if format is null), null if column is null" . ($handleMysqlDate ? ', and 0 if column value is ' . $mysqlInvalidDateString : '');
         } else {
             $script .= "
-     * @return mixed Formatted date/time value as string or (integer) unix timestamp (if format is null), null if column is null" . ($handleMysqlDate ? ', and 0 if column value is ' . $mysqlInvalidDateString : '');
+     * @return null|string|int mixed Formatted date/time value as string or (integer) unix timestamp (if format is null), null if column is null" . ($handleMysqlDate ? ', and 0 if column value is ' . $mysqlInvalidDateString : '');
         }
         $script .= "
      * @throws PropelException - if unable to parse/validate the date/time value.
@@ -1147,7 +1147,7 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . " ";
      * @param PropelPDO \$con An optional PropelPDO connection to use for fetching this lazy-loaded column.";
         }
         $script .= "
-     * @return "               . $col->getPhpType() . "
+     * @return "               . (strlen($col->getPhpType()) > 0 ? $col->getPhpType() : 'StdClass') . "
      * @throws PropelException - if the stored enum key is unknown.
      */";
 
@@ -1260,7 +1260,7 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . " ";
      * @param PropelPDO \$con An optional PropelPDO connection to use for fetching this lazy-loaded column.";
         }
         $script .= "
-     * @return " . $col->getPhpType() . "
+     * @return " . (strlen($col->getPhpType()) > 0 ? $col->getPhpType() : 'StdClass') . "
      */";
     }
 
@@ -1411,6 +1411,9 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . " ";
         try {
             \$stmt = " . $this->getPeerClassname() . "::doSelectStmt(\$c, \$con);
             \$row = \$stmt->fetch(PDO::FETCH_NUM);
+            if (\$row === false) {
+                \$row = [null]; // for backward compatibility
+            }
             \$stmt->closeCursor();";
         }
 
@@ -1493,7 +1496,7 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . " ";
     /**
      * Set the value of [$clo] column.
      * " . $col->getDescription() . "
-     * @param  " . $col->getPhpType() . " \$v new value
+     * @param  " . (strlen($col->getPhpType()) == 0 ? 'StdClass' : $col->getPhpType()) . "|null \$v new value
      * @return "   . $this->getObjectClassname() . " The current object (for fluent API support)
      */";
     }
@@ -1731,7 +1734,7 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . " ";
     /**
      * Sets the value of [$clo] column to a normalized version of the date/time value specified.
      * " . $col->getDescription() . "
-     * @param mixed \$v string, integer (timestamp), or DateTime value.
+     * @param null|string|int|DateTime \$v string, integer (timestamp), or DateTime value.
      *               Empty strings are treated as null.
      * @return " . $this->getObjectClassname() . " The current object (for fluent API support)
      */";
@@ -1892,7 +1895,7 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . " ";
     /**
      * Set the value of [$clo] column.
      * " . $col->getDescription() . "
-     * @param  " .             $col->getPhpType() . " \$v new value
+     * @param  " .             (strlen($col->getPhpType()) == 0 ? 'StdClass' : $col->getPhpType()) . " \$v new value
      * @return "               . $this->getObjectClassname() . " The current object (for fluent API support)
      * @throws PropelException - if the value is not accepted by this enum.
      */";
@@ -2644,13 +2647,12 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . " ";
             $script .= "
             case $i:
                 return \$this->get$cfc();
-                break;";
+                ";
             $i++;
         } /* foreach */
         $script .= "
             default:
                 return null;
-                break;
         } // switch()";
     }
 
@@ -3284,7 +3286,7 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . " ";
             }
             $script .= "
 
-        return " . join(' && ', $tests) . ";";
+        return " . implode(' && ', $tests) . ";";
         }
         $script .= "
     }
@@ -3390,7 +3392,7 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . " ";
     /**
      * Declares an association between this object and a $className object.
      *
-     * @param                  $className \$v
+     * @param                  null|$className \$v
      * @return "               . $this->getObjectClassname() . " The current object (for fluent API support)
      * @throws PropelException
      */
@@ -3497,7 +3499,7 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . " ";
      * Get the associated $className object
      *
      * @param PropelPDO \$con Optional Connection object.
-     * @param \$doQuery Executes a query to get the object if required
+     * @param bool \$doQuery Executes a query to get the object if required
      * @return $className The associated $className object.
      * @throws PropelException
      */
@@ -3809,6 +3811,7 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . " ";
     /**
      * reset is the $collName collection loaded partially
      *
+     * @param bool \$v
      * @return void
      */
     public function resetPartial{$relCol}(\$v = true)
@@ -4105,6 +4108,7 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . " ";
     protected function addRefFKDoAdd(&$script, $refFK)
     {
         $relatedObjectClassName = $this->getRefFKPhpNameAffix($refFK, $plural = false);
+        $relatedObjectName = $this->getNewStubObjectBuilder($refFK->getTable())->getClassname();
 
         $lowerRelatedObjectClassName = lcfirst($relatedObjectClassName);
 
@@ -4112,7 +4116,7 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . " ";
 
         $script .= "
     /**
-     * @param	{$relatedObjectClassName} \${$lowerRelatedObjectClassName} The $lowerRelatedObjectClassName object to add.
+     * @param	{$relatedObjectName} \${$lowerRelatedObjectClassName} The $lowerRelatedObjectClassName object to add.
      */
     protected function doAdd{$relatedObjectClassName}(\${$lowerRelatedObjectClassName})
     {
@@ -4131,6 +4135,7 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . " ";
     {
         $relatedName = $this->getRefFKPhpNameAffix($refFK, $plural = true);
         $relatedObjectClassName = $this->getRefFKPhpNameAffix($refFK, $plural = false);
+        $relatedObjectName = $this->getNewStubObjectBuilder($refFK->getTable())->getClassname();
 
         $inputCollection = lcfirst($relatedName . 'ScheduledForDeletion');
         $lowerRelatedObjectClassName = lcfirst($relatedObjectClassName);
@@ -4142,7 +4147,7 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . " ";
 
         $script .= "
     /**
-     * @param	{$relatedObjectClassName} \${$lowerRelatedObjectClassName} The $lowerRelatedObjectClassName object to remove.
+     * @param	{$relatedObjectName} \${$lowerRelatedObjectClassName} The $lowerRelatedObjectClassName object to remove.
      * @return " . $this->getObjectClassname() . " The current object (for fluent API support)
      */
     public function remove{$relatedObjectClassName}(\${$lowerRelatedObjectClassName})
@@ -4637,7 +4642,7 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . " ";
 
         $script .= "
     /**
-     * @param	{$relatedObjectClassName} \${$lowerRelatedObjectClassName} The $lowerRelatedObjectClassName object to add.
+     * @param	{$relatedObjectName} \${$lowerRelatedObjectClassName} The $lowerRelatedObjectClassName object to add.
      */
     protected function doAdd{$relatedObjectClassName}({$relatedObjectName} \${$lowerRelatedObjectClassName})
     {

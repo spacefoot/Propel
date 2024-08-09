@@ -279,7 +279,7 @@ class Criteria implements IteratorAggregate
      * Implementing SPL IteratorAggregate interface.  This allows
      * you to foreach () over a Criteria object.
      */
-    public function getIterator()
+    public function getIterator() : Traversable
     {
         return new CriterionIterator($this);
     }
@@ -550,7 +550,7 @@ class Criteria implements IteratorAggregate
     /**
      * Method to return the latest Criterion in a table.
      *
-     * @return Criterion A Criterion or null no Criterion is added.
+     * @return Criterion|null A Criterion or null no Criterion is added.
      */
     public function getLastCriterion()
     {
@@ -789,7 +789,7 @@ class Criteria implements IteratorAggregate
      * The name of the table must be used implicitly in the column name,
      * so the Column name must be something like 'TABLE.id'.
      *
-     * @param string $critOrColumn The column to run the comparison on, or a Criterion object.
+     * @param string|Criterion $critOrColumn The column to run the comparison on, or a Criterion object.
      * @param mixed  $value
      * @param string $comparison   A String.
      *
@@ -824,7 +824,7 @@ class Criteria implements IteratorAggregate
      * so the Column name must be something like 'TABLE.id'.
      *
      * @param string $name       name to combine the criterion later
-     * @param string $p1         The column to run the comparison on, or Criterion object.
+     * @param string|Criterion $p1         The column to run the comparison on, or Criterion object.
      * @param mixed  $value
      * @param string $comparison A String.
      *
@@ -887,7 +887,7 @@ class Criteria implements IteratorAggregate
      *                             among Criteria::INNER_JOIN, Criteria::LEFT_JOIN,
      *                             and Criteria::RIGHT_JOIN
      *
-     * @return Criteria A modified Criteria object.
+     * @return self
      */
     public function addJoin($left, $right, $joinType = null)
     {

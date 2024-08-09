@@ -161,7 +161,7 @@ class ModelCriteria extends Criteria
      *
      * @param string|PropelFormatter $formatter a formatter class name, or a formatter instance
      *
-     * @return ModelCriteria The current object, for fluid interface
+     * @return $this
      *
      * @throws PropelException
      */
@@ -285,7 +285,7 @@ class ModelCriteria extends Criteria
      * @param mixed  $value       A value for the condition
      * @param string $bindingType
      *
-     * @return ModelCriteria The current object, for fluid interface
+     * @return $this
      */
     public function where($clause, $value = null, $bindingType = null)
     {
@@ -460,7 +460,7 @@ class ModelCriteria extends Criteria
      * Adds a DISTINCT clause to the query
      * Alias for Criteria::setDistinct()
      *
-     * @return ModelCriteria The current object, for fluid interface
+     * @return $this
      */
     public function distinct()
     {
@@ -475,7 +475,7 @@ class ModelCriteria extends Criteria
      *
      * @param int $limit Maximum number of results to return by the query
      *
-     * @return ModelCriteria The current object, for fluid interface
+     * @return $this
      */
     public function limit($limit)
     {
@@ -490,7 +490,7 @@ class ModelCriteria extends Criteria
      *
      * @param int $offset Offset of the first result to return
      *
-     * @return ModelCriteria The current object, for fluid interface
+     * @return $this
      */
     public function offset($offset)
     {
@@ -519,24 +519,24 @@ class ModelCriteria extends Criteria
      *
      * @param mixed $columnArray A list of column names (e.g. array('Title', 'Category.Name', 'c.Content')) or a single column name (e.g. 'Name')
      *
-     * @return ModelCriteria The current object, for fluid interface
+     * @return $this
      *
      * @throws PropelException
      */
     public function select($columnArray)
     {
-        if (!count($columnArray) || $columnArray == '') {
+        if (empty($columnArray)) {
             throw new PropelException('You must ask for at least one column');
         }
 
-        if ($columnArray == '*') {
+        if (is_string($columnArray) && $columnArray === '*') {
             $columnArray = array();
             foreach (call_user_func(array($this->modelPeerName, 'getFieldNames'), BasePeer::TYPE_PHPNAME) as $column) {
                 $columnArray[] = $this->modelName . '.' . $column;
             }
         }
 
-        $this->select = $columnArray;
+        $this->select = (array)$columnArray;
 
         return $this;
     }
@@ -652,7 +652,7 @@ class ModelCriteria extends Criteria
      * @param string $relation Relation to use for the join
      * @param string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return ModelCriteria The current object, for fluid interface
+     * @return $this
      *
      * @throws PropelException
      */
@@ -920,7 +920,7 @@ class ModelCriteria extends Criteria
      *                           If no alias is provided, the clause is used as a column alias
      *                           This alias is used for retrieving the column via BaseObject::getVirtualColumn($alias)
      *
-     * @return ModelCriteria The current object, for fluid interface
+     * @return $this
      */
     public function withColumn($clause, $name = null)
     {
@@ -1485,7 +1485,7 @@ class ModelCriteria extends Criteria
      *
      * @param PropelPDO $con an optional connection object
      *
-     * @return integer the number of results
+     * @return int the number of results
      */
     public function count($con = null)
     {
@@ -1632,7 +1632,7 @@ class ModelCriteria extends Criteria
      *
      * @param PropelPDO $con an optional connection object
      *
-     * @return integer the number of deleted rows
+     * @return int the number of deleted rows
      *
      * @throws PropelException
      */
@@ -1670,7 +1670,7 @@ class ModelCriteria extends Criteria
      *
      * @param PropelPDO $con a connection object
      *
-     * @return integer the number of deleted rows
+     * @return int the number of deleted rows
      */
     public function doDelete($con)
     {
@@ -1685,7 +1685,7 @@ class ModelCriteria extends Criteria
      *
      * @param PropelPDO $con an optional connection object
      *
-     * @return integer the number of deleted rows
+     * @return int the number of deleted rows
      *
      * @throws Exception|PropelException
      */
@@ -1715,7 +1715,7 @@ class ModelCriteria extends Criteria
      *
      * @param PropelPDO $con a connection object
      *
-     * @return integer the number of deleted rows
+     * @return int the number of deleted rows
      */
     public function doDeleteAll($con)
     {
@@ -1765,7 +1765,7 @@ class ModelCriteria extends Criteria
      * @param PropelPDO $con                  an optional connection object
      * @param boolean   $forceIndividualSaves If false (default), the resulting call is a BasePeer::doUpdate(), otherwise it is a series of save() calls on all the found objects
      *
-     * @return Integer Number of updated rows
+     * @return int Number of updated rows
      *
      * @throws PropelException
      */
@@ -1811,7 +1811,7 @@ class ModelCriteria extends Criteria
      * @param PropelPDO $con                  a connection object
      * @param boolean   $forceIndividualSaves If false (default), the resulting call is a BasePeer::doUpdate(), otherwise it is a series of save() calls on all the found objects
      *
-     * @return Integer Number of updated rows
+     * @return int Number of updated rows
      */
     public function doUpdate($values, $con, $forceIndividualSaves = false)
     {

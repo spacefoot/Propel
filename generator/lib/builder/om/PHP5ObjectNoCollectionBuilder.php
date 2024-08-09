@@ -111,6 +111,9 @@ class PHP5ObjectNoCollectionBuilder extends PHP5ObjectBuilder
         try {
             \$stmt = " . $this->getPeerClassname() . "::doSelectStmt(\$c, \$con);
             \$row = \$stmt->fetch(PDO::FETCH_NUM);
+            if (\$row === false) {
+                \$row = [null]; // for backward compatibility
+            }
             \$stmt->closeCursor();";
 
         if ($col->getType() === PropelTypes::CLOB && $this->getPlatform() instanceof OraclePlatform) {
@@ -537,7 +540,7 @@ class PHP5ObjectNoCollectionBuilder extends PHP5ObjectBuilder
      * Get the associated $className object
      *
      * @param      PropelPDO Optional Connection object.
-     * @return                 $className The associated $className object.
+     * @return     $className|null The associated $className object.
      * @throws PropelException
      */
     public function get" . $this->getFKPhpNameAffix($fk, $plural = false) . "(PropelPDO \$con = null)
