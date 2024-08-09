@@ -96,6 +96,7 @@ class SortableBehavior extends Behavior
 
             $methodSignature = array();
             $buildScope      = array();
+            $buildScopeVars  = array();
             $paramsDoc       = array();
             $buildScopeVars  = array();
 
