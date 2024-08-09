@@ -8,7 +8,7 @@
  * @license    MIT License
  */
 
-require_once dirname(__FILE__) . '/VendorInfo.php';
+
 
 /**
  * An abstract class for elements represented by XML tags (e.g. Column, Table).
@@ -89,6 +89,10 @@ abstract class XMLElement
      */
     protected function booleanValue($val)
     {
+        if ($val === null) {
+            return false;
+        }
+
         if (is_numeric($val)) {
             return (bool) $val;
         } else {
@@ -109,7 +113,7 @@ abstract class XMLElement
             $values[] = trim($v);
         }
 
-        $value = implode($values, ' | ');
+        $value = implode(' | ', $values);
         if (empty($value) || ' | ' === $value) {
             return null;
         }

@@ -142,7 +142,7 @@ class QueryBuilder extends OMBuilder
         // override the signature of ModelCriteria::findOne() to specify the class of the returned object, for IDE completion
         $script .= "
  * @method $modelClass findOne(PropelPDO \$con = null) Return the first $modelClass matching the query
- * @method $modelClass findOneOrCreate(PropelPDO \$con = null) Return the first $modelClass matching the query, or a new $modelClass object populated from the query conditions when no match is found
+ * @method $modelClass findOneOrCreate(PropelPDO \$con = null) Return the first $modelClass matching the query, or a new $modelClass object populated from the query conditions when no record is found
  *";
 
         // magic findBy() methods, for IDE completion
@@ -415,10 +415,10 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . "
             }
             $pkType = 'array';
             $pkDescription = "
-                         A Primary key composition: " . '[' . join($colNames, ', ') . ']';
+                         A Primary key composition: " . '[' . join(', ', $colNames) . ']';
             $script .= "
      * <code>
-     * \$obj = \$c->findPk(array(" . join($examplePk, ', ') . "), \$con);";
+     * \$obj = \$c->findPk(array(" . join(', ', $examplePk) . "), \$con);";
         } else {
             $pkType = 'mixed';
             $script .= "
@@ -667,10 +667,11 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . "
      * Filter the query by primary key
      *
      * @param     mixed \$key Primary key to use for the query
+     * @param     string \$comparison Default is Criteria::EQUAL
      *
      * @return " . $this->getStubQueryBuilder()->getClassname() . " The current query, for fluid interface
      */
-    public function filterByPrimaryKey(\$key)
+    public function filterByPrimaryKey(\$key, \$comparison = Criteria::EQUAL)
     {";
         $table = $this->getTable();
         $pks = $table->getPrimaryKey();
@@ -680,14 +681,14 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . "
             $const = $this->getColumnConstant($col);
             $script .= "
 
-        return \$this->addUsingAlias($const, \$key, Criteria::EQUAL);";
+        return \$this->addUsingAlias($const, \$key, \$comparison);";
         } else {
             // composite primary key
             $i = 0;
             foreach ($pks as $col) {
                 $const = $this->getColumnConstant($col);
                 $script .= "
-        \$this->addUsingAlias($const, \$key[$i], Criteria::EQUAL);";
+        \$this->addUsingAlias($const, \$key[$i], \$comparison);";
                 $i++;
             }
             $script .= "
@@ -818,7 +819,7 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . "
      * \$query->filterBy$colPhpName('%fooValue%'); // WHERE $colName LIKE '%fooValue%'
      * </code>
      *
-     * @param     string \$$variableName The value to use as filter.
+     * @param     array|string \$$variableName The value to use as filter.
      *              Accepts wildcards (* and % trigger a LIKE)";
         } elseif ($col->isBooleanType()) {
             $script .= "
@@ -1282,12 +1283,12 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . "
      * Filter the query by a related $fkPhpName object
      * using the $crossTableName table as cross reference
      *
-     * @param   $fkPhpName $objectName the related object to use as filter
+     * @param   $fkPhpName|PropelObjectCollection $objectName the related object to use as filter
      * @param     string \$comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   $queryClass The current query, for fluid interface
      */
-    public function filterBy{$relName}($objectName, \$comparison = Criteria::EQUAL)
+    public function filterBy{$relName}($objectName, \$comparison = null)
     {
         return \$this
             ->use{$relationName}Query()

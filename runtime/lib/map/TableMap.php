@@ -281,7 +281,7 @@ class TableMap
     /**
      * Get the name of the sequence used to generate a primary key
      *
-     * @return An Object.
+     * @return stdClass An Object.
      */
     public function getPrimaryKeyMethodInfo()
     {
@@ -786,6 +786,10 @@ class TableMap
      */
     protected function hasPrefix($data)
     {
+        if (!$this->prefix) {
+            return false;
+        }
+
         return (strpos($data, $this->prefix) === 0);
     }
 

@@ -37,10 +37,8 @@ class sfYamlInline
       return '';
     }
 
-    if (function_exists('mb_internal_encoding') && ((int) ini_get('mbstring.func_overload')) & 2) {
-      $mbEncoding = mb_internal_encoding();
-      mb_internal_encoding('ASCII');
-    }
+    $mbEncoding = mb_internal_encoding();
+    mb_internal_encoding('ASCII');
 
     switch ($value[0]) {
       case '[':
@@ -90,8 +88,6 @@ class sfYamlInline
         return 'true';
       case false === $value:
         return 'false';
-      case ctype_digit($value):
-        return is_string($value) ? "'$value'" : (int) $value;
       case is_numeric($value):
         return is_infinite($value) ? str_ireplace('INF', '.Inf', strval($value)) : (is_string($value) ? "'$value'" : $value);
       case false !== strpos($value, "\n") || false !== strpos($value, "\r"):
@@ -124,10 +120,8 @@ class sfYamlInline
   {
     // array
     $keys = array_keys($value);
-    if (
-      (1 == count($keys) && '0' == $keys[0])
-      ||
-      (count($keys) > 1 && array_reduce($keys, create_function('$v,$w', 'return (integer) $v + $w;'), 0) == count($keys) * (count($keys) - 1) / 2))
+    
+    if (count($value) > 0 && array_values($value) === $value)
     {
       $output = array();
       foreach ($value as $val) {
