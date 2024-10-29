@@ -1905,10 +1905,16 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . " ";
         $script .= "
         if (\$v !== null) {
             \$valueSet = " . $this->getPeerClassname() . "::getValueSet(" . $this->getColumnConstant($col) . ");
-            if (!in_array(\$v, \$valueSet)) {
-                throw new PropelException(sprintf('Value \"%s\" is not accepted in this enumerated column', \$v));
+            if (is_numeric(\$v)) {
+                if (!isset(\$valueSet[\$v])) {
+                    throw new PropelException(sprintf('Value \"%s\" is not accepted in this enumerated column', \$v));
+                }
+            } else {
+                if (!in_array(\$v, \$valueSet)) {
+                    throw new PropelException(sprintf('Value \"%s\" is not accepted in this enumerated column', \$v));
+                }
+                \$v = array_search(\$v, \$valueSet);
             }
-            \$v = array_search(\$v, \$valueSet);
         }
 
         if (\$this->$clo !== \$v) {
